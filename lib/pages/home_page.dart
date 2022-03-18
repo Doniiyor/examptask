@@ -15,13 +15,19 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   List<UserContact> user = [];
+  bool isLoading = false;
 
-  void getCards() {
+  void getContact() {
+    setState(() {
+      isLoading = true;
+    });
     Network.GET(Network.API_LIST, Network.paramsEmpty()).then((value) {
       setState(() {
         user = Network.parseCards(value);
+        isLoading = false;
       });
     });
+
   }
 
   void deleteCard (String id,  int index) {
@@ -34,7 +40,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    getCards();
+    getContact();
     super.initState();
   }
 
@@ -51,7 +57,8 @@ class _HomePageState extends State<HomePage> {
           color: Colors.black,),
       ),
 
-      body: SingleChildScrollView(
+      body: isLoading ? Center(child: CircularProgressIndicator(),)
+     : SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 25),
           child: Column(

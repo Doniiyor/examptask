@@ -15,7 +15,7 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-
+  bool isLoading = false;
   TextEditingController userNameController = TextEditingController();
   TextEditingController relationshipController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
@@ -25,9 +25,17 @@ class _DetailPageState extends State<DetailPage> {
     String userName = userNameController.text.trim().toString();
     String relation = relationshipController.text.trim().toString();
     String phone = phoneController.text.trim().toString();
-
+    if(userName.isEmpty || relation.isEmpty || phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("All fields must be filled")));
+      return;
+    }
+    setState(() {
+      isLoading = true;
+    });
     UserContact user = UserContact(userName: userName, relationship: relation, phoneNumber: phone,);
     Network.POST(Network.API_CREATE, Network.paramsCreate(user)).then((value){
+
       getResponse(value);
       print(value);
 
@@ -62,7 +70,8 @@ class _DetailPageState extends State<DetailPage> {
           style: TextStyle(color: Colors.black),
         ),
       ),
-      body: Column(
+      body: isLoading ? Center(child: CircularProgressIndicator())
+     : Column(
         children: [
           Container(
             padding: EdgeInsets.only(top: 35),
